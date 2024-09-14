@@ -23,4 +23,38 @@ function renderColumn(title, users) {
     const wrapperDiv = document.getElementById('wrapper');
     wrapperDiv.appendChild(columnDiv);
 }
- 
+
+function extractDomain(website) {
+    // I created the regex pattern on https://regexr.com
+    const re = /\.([a-z]*)/
+
+    return re.exec(website)[0];
+}
+
+function fetchUsers() {
+    const columns = [];
+
+    fetch(USERS_ENDPOINT)
+        .then((response) => response.json())
+        .then((users) => {
+            users.forEach((user) => {
+                var domain = extractDomain(user.website);
+
+                if (!columns.includes(domain)) {
+                    columns.push(domain)
+                }
+            })
+
+            columns.forEach((title) => {
+                var filtered_users = users.filter((user) => extractDomain(user.website) == title)
+                renderColumn(title, filtered_users)
+            })
+            
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
+}
+
+
+fetchUsers()    
